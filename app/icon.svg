@@ -1,0 +1,18 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="glass_grad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4F46E5" /> <stop offset="1" stop-color="#EC4899" /> </linearGradient>
+    <filter id="glow" x="-4" y="-4" width="40" height="40" filterUnits="userSpaceOnUse">
+       <feGaussianBlur stdDeviation="2" result="blur"/>
+       <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  
+  <rect x="0" y="0" width="32" height="32" rx="10" fill="url(#glass_grad)" />
+  
+  <path 
+    d="M16 4C16.5 10 18 14 28 16C18 18 16.5 22 16 28C15.5 22 14 18 4 16C14 14 15.5 10 16 4Z" 
+    fill="white" 
+    filter="url(#glow)"
+  />
+</svg>
