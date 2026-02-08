@@ -44,33 +44,32 @@ const ROSE_COLORS = [
 const THEMES = {
   birthday: { 
     id: 'birthday',
-    color: "text-pink-600 drop-shadow-sm", 
-    bgGradient: "from-pink-50 via-purple-50 to-blue-50",
-    flowerColors: ["#E879F9", "#D946EF", "#C026D3", "#A21CAF"], 
+    color: "text-pink-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]", 
+    flowerColors: ["#E879F9", "#D946EF", "#C026D3", "#A21CAF"], // Confetti colors
     emoji: "🎂", 
     music: "/music/birthday.mp3" 
   },
   anniversary: { 
     id: 'anniversary',
-    color: "text-red-600 drop-shadow-sm", 
-    bgGradient: "from-red-50 via-pink-50 to-rose-50",
-    flowerColors: ["#F87171", "#EF4444", "#DC2626", "#B91C1C"], 
+    color: "text-red-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]", 
+    flowerColors: ["#F87171", "#EF4444", "#DC2626", "#B91C1C"], // Confetti colors
     emoji: "💑", 
     music: "/music/romantic.mp3" 
   },
   congrats: { 
     id: 'congrats',
-    color: "text-teal-600 drop-shadow-sm", 
-    bgGradient: "from-teal-50 via-cyan-50 to-sky-50",
-    flowerColors: ["#5EEAD4", "#2DD4BF", "#14B8A6", "#0D9488"], 
+    color: "text-teal-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]", 
+    flowerColors: ["#5EEAD4", "#2DD4BF", "#14B8A6", "#0D9488"], // Confetti colors
     emoji: "🎉", 
     music: "/music/celebration.mp3" 
   },
   valentinesday: { 
-    color: "text-rose-600 drop-shadow-sm", 
-    bgGradient: "from-rose-50 via-pink-50 to-red-50",
+    id: 'valentinesday', // Ensure ID matches exactly
+    color: "text-rose-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]", 
     emoji: "🌺", 
     music: "/music/valentine.mp3",
+    // ADD THIS MISSING LINE BELOW:
+    flowerColors: ["#E11D48", "#BE123C", "#FB7185", "#F43F5E"], 
     colors: [
       { petal: "#D50000", center: "#5D1010" }, 
       { petal: "#FF1744", center: "#880E4F" }, 
