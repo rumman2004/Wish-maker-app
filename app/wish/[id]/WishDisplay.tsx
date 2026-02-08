@@ -40,12 +40,13 @@ const ROSE_COLORS = [
   { petal: "#F06292", center: "#AD1457" }, // Rose Pink
 ];
 
-// --- Constants with Light Theme ---
+// --- Constants ---
 const THEMES = {
   birthday: { 
     id: 'birthday',
     color: "text-pink-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]", 
     flowerColors: ["#E879F9", "#D946EF", "#C026D3", "#A21CAF"], // Confetti colors
+    colors: ROSE_COLORS, // Rose colors (Standard Mix)
     emoji: "🎂", 
     music: "/music/birthday.mp3" 
   },
@@ -53,6 +54,7 @@ const THEMES = {
     id: 'anniversary',
     color: "text-red-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]", 
     flowerColors: ["#F87171", "#EF4444", "#DC2626", "#B91C1C"], // Confetti colors
+    colors: ROSE_COLORS, // Rose colors (Standard Mix)
     emoji: "💑", 
     music: "/music/romantic.mp3" 
   },
@@ -60,16 +62,17 @@ const THEMES = {
     id: 'congrats',
     color: "text-teal-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]", 
     flowerColors: ["#5EEAD4", "#2DD4BF", "#14B8A6", "#0D9488"], // Confetti colors
+    colors: ROSE_COLORS, // Rose colors (Standard Mix)
     emoji: "🎉", 
     music: "/music/celebration.mp3" 
   },
   valentinesday: { 
-    id: 'valentinesday', // Ensure ID matches exactly
+    id: 'valentinesday',
     color: "text-rose-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]", 
+    flowerColors: ["#E11D48", "#BE123C", "#FB7185", "#F43F5E"], // Confetti colors
     emoji: "🌺", 
     music: "/music/valentine.mp3",
-    // ADD THIS MISSING LINE BELOW:
-    flowerColors: ["#E11D48", "#BE123C", "#FB7185", "#F43F5E"], 
+    // Special Red/Pink mix for Valentine's
     colors: [
       { petal: "#D50000", center: "#5D1010" }, 
       { petal: "#FF1744", center: "#880E4F" }, 
@@ -86,6 +89,7 @@ export default function WishDisplay({ wish }: WishProps) {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const themeKey = (wish.theme as ThemeType) || 'birthday';
+  // Fallback to birthday if theme key doesn't match
   const theme = THEMES[themeKey] || THEMES.birthday;
 
   // --- Auto-Play Logic ---
@@ -143,7 +147,7 @@ export default function WishDisplay({ wish }: WishProps) {
     }
   };
 
-  // --- Rose Generation (IMPROVED FOR VISIBILITY) ---
+  // --- Rose Generation ---
   const handleScreenClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isPlaying) attemptPlay();
 
@@ -152,12 +156,13 @@ export default function WishDisplay({ wish }: WishProps) {
       return;
     }
 
-    const availableColors = theme.colors || ROSE_COLORS;
+    // Now TypeScript knows theme.colors always exists
+    const availableColors = theme.colors; 
     const colorPalette = availableColors[Math.floor(Math.random() * availableColors.length)];
     
-    // Much taller flowers for better visibility
-    const isMobile = window.innerWidth < 640;
-    const isTablet = window.innerWidth < 1024;
+    // Taller flowers for better visibility on all screens
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+    const isTablet = typeof window !== 'undefined' && window.innerWidth < 1024;
     const height = isMobile 
       ? 220 + Math.random() * 120  // Mobile: 220-340px
       : isTablet 
@@ -190,29 +195,29 @@ export default function WishDisplay({ wish }: WishProps) {
   // --- Render: Locked State ---
   if (locked) {
     return (
-      <div className={`min-h-screen flex items-center justify-center p-3 sm:p-4 bg-gradient-to-br ${theme.bgGradient}`}>
+      <div className={`min-h-screen flex items-center justify-center p-3 sm:p-4 bg-gradient-to-br from-gray-900 via-gray-800 to-black`}>
         <audio ref={audioRef} src={theme.music} loop /> 
         
         <motion.div 
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           transition={{ duration: 0.8, type: "spring" }}
-          className="w-full max-w-[90%] sm:max-w-[85%] md:max-w-sm p-6 sm:p-8 text-center bg-white rounded-2xl sm:rounded-[25px] md:rounded-[30px] shadow-2xl border border-slate-200"
+          className="w-full max-w-[90%] sm:max-w-[85%] md:max-w-sm p-6 sm:p-8 text-center bg-white/10 backdrop-blur-xl rounded-2xl sm:rounded-[25px] md:rounded-[30px] shadow-2xl border border-white/20"
         >
           <motion.div 
             animate={{ scale: [1, 1.05, 1], rotate: [0, 5, -5, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-slate-100 border-2 border-slate-200 flex items-center justify-center mx-auto mb-4 sm:mb-6 text-slate-700 shadow-lg"
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4 sm:mb-6 text-white shadow-lg"
           >
             <Lock className="w-7 h-7 sm:w-8 sm:h-8" />
           </motion.div>
-          <h2 className="text-xl sm:text-2xl font-black mb-2 sm:mb-3 text-slate-800">Protected Wish</h2>
-          <p className="text-xs sm:text-sm text-slate-600 mb-6 sm:mb-8 font-medium">Enter the secret PIN to unlock magic</p>
+          <h2 className="text-xl sm:text-2xl font-black mb-2 sm:mb-3 text-white">Protected Wish</h2>
+          <p className="text-xs sm:text-sm text-white/80 mb-6 sm:mb-8 font-medium">Enter the secret PIN to unlock magic</p>
           
           <input 
             type="password" 
             maxLength={4}
-            className="w-full p-4 sm:p-5 mb-6 sm:mb-8 text-center tracking-[1.2em] sm:tracking-[1.5em] text-xl sm:text-2xl font-bold outline-none rounded-xl sm:rounded-2xl bg-slate-50 border-2 border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 text-slate-800 transition-all"
+            className="w-full p-4 sm:p-5 mb-6 sm:mb-8 text-center tracking-[1.2em] sm:tracking-[1.5em] text-xl sm:text-2xl font-bold outline-none rounded-xl sm:rounded-2xl bg-black/20 border border-white/10 focus:border-white/40 text-white placeholder-white/30 transition-all"
             placeholder="••••"
             onChange={(e) => setInputPin(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && unlock()}
@@ -222,7 +227,7 @@ export default function WishDisplay({ wish }: WishProps) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={unlock} 
-            className="w-full py-4 sm:py-5 rounded-xl sm:rounded-2xl font-black text-base sm:text-lg tracking-wider uppercase bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 transition-all"
+            className="w-full py-4 sm:py-5 rounded-xl sm:rounded-2xl font-black text-base sm:text-lg tracking-wider uppercase bg-white/20 hover:bg-white/30 text-white border border-white/30 shadow-lg transition-all"
           >
             <Unlock size={18} className="sm:w-5 sm:h-5 inline mr-2 sm:mr-3 -mt-1" /> Unlock Wish
           </motion.button>
@@ -235,7 +240,7 @@ export default function WishDisplay({ wish }: WishProps) {
   return (
     <div 
       onClick={handleScreenClick}
-      className={`relative min-h-screen flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-hidden cursor-pointer bg-gradient-to-br ${theme.bgGradient}`}
+      className={`relative min-h-screen flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-hidden cursor-pointer bg-[conic-gradient(at_top_left,_var(--tw-gradient-stops))] from-indigo-900 via-purple-900 to-pink-900`}
     >
       <audio ref={audioRef} src={theme.music} loop />
       
@@ -244,7 +249,7 @@ export default function WishDisplay({ wish }: WishProps) {
         onClick={toggleMusic}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed top-3 right-3 sm:top-4 sm:right-4 md:top-6 md:right-6 z-50 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-white hover:bg-slate-50 border-2 border-slate-200 flex items-center justify-center text-slate-700 shadow-xl transition-all"
+        className="fixed top-3 right-3 sm:top-4 sm:right-4 md:top-6 md:right-6 z-50 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-xl transition-all hover:bg-white/20"
       >
         {isPlaying ? (
           <Pause className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" fill="currentColor" />
@@ -258,7 +263,7 @@ export default function WishDisplay({ wish }: WishProps) {
         initial={{ scale: 0.95, opacity: 0, y: 30 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         transition={{ duration: 1, type: "spring", bounce: 0.3 }}
-        className="wish-card relative z-20 w-full max-w-[95%] sm:max-w-2xl md:max-w-3xl p-6 sm:p-8 md:p-12 text-center bg-white rounded-2xl sm:rounded-[25px] md:rounded-[30px] shadow-2xl border border-slate-200"
+        className="wish-card relative z-20 w-full max-w-[95%] sm:max-w-2xl md:max-w-3xl p-6 sm:p-8 md:p-12 text-center bg-white/10 backdrop-blur-xl rounded-2xl sm:rounded-[25px] md:rounded-[30px] shadow-2xl border border-white/20"
       >
         <motion.div 
           animate={{
@@ -276,8 +281,8 @@ export default function WishDisplay({ wish }: WishProps) {
           For {wish.name}
         </h1>
         
-        <div className="relative p-4 sm:p-6 md:p-8 min-h-[100px] sm:min-h-[120px] md:min-h-[160px] flex items-center justify-center bg-slate-50 border border-slate-200 rounded-2xl sm:rounded-3xl shadow-inner">
-          <p className="text-base sm:text-lg md:text-3xl text-slate-800 leading-relaxed font-medium italic">
+        <div className="relative p-4 sm:p-6 md:p-8 min-h-[100px] sm:min-h-[120px] md:min-h-[160px] flex items-center justify-center bg-black/20 border border-white/10 rounded-2xl sm:rounded-3xl shadow-inner">
+          <p className="text-base sm:text-lg md:text-3xl text-white/90 leading-relaxed font-medium italic drop-shadow-md">
             &ldquo;{wish.message}&rdquo;
           </p>
         </div>
@@ -286,7 +291,7 @@ export default function WishDisplay({ wish }: WishProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          className="mt-4 sm:mt-6 md:mt-10 text-[9px] sm:text-[10px] md:text-sm text-slate-600 uppercase tracking-[0.3em] sm:tracking-[0.4em] font-extrabold"
+          className="mt-4 sm:mt-6 md:mt-10 text-[9px] sm:text-[10px] md:text-sm text-white/70 uppercase tracking-[0.3em] sm:tracking-[0.4em] font-extrabold"
         >
           Tap anywhere to bloom roses 🌹✨
         </motion.div>
