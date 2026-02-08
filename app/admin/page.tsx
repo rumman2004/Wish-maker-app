@@ -24,7 +24,7 @@ export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState('');
 
   // ⚠️ CHANGE THIS PASSWORD FOR PRODUCTION
-const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin123"; 
+const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_PASSWORD; 
 
   const fetchWishes = useCallback(async () => {
     setLoading(true);
