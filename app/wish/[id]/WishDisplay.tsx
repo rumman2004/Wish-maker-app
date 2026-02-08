@@ -44,35 +44,34 @@ const ROSE_COLORS = [
 const THEMES = {
   birthday: { 
     id: 'birthday',
-    color: "text-pink-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]", 
-    flowerColors: ["#E879F9", "#D946EF", "#C026D3", "#A21CAF"], // Confetti colors
-    colors: ROSE_COLORS, // Rose colors (Standard Mix)
+    color: "text-pink-400 drop-shadow-sm", 
+    flowerColors: ["#E879F9", "#D946EF", "#C026D3", "#A21CAF"], 
+    colors: ROSE_COLORS, 
     emoji: "🎂", 
     music: "/music/birthday.mp3" 
   },
   anniversary: { 
     id: 'anniversary',
-    color: "text-red-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]", 
-    flowerColors: ["#F87171", "#EF4444", "#DC2626", "#B91C1C"], // Confetti colors
-    colors: ROSE_COLORS, // Rose colors (Standard Mix)
+    color: "text-red-400 drop-shadow-sm", 
+    flowerColors: ["#F87171", "#EF4444", "#DC2626", "#B91C1C"], 
+    colors: ROSE_COLORS,
     emoji: "💑", 
     music: "/music/romantic.mp3" 
   },
   congrats: { 
     id: 'congrats',
-    color: "text-teal-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]", 
-    flowerColors: ["#5EEAD4", "#2DD4BF", "#14B8A6", "#0D9488"], // Confetti colors
-    colors: ROSE_COLORS, // Rose colors (Standard Mix)
+    color: "text-teal-400 drop-shadow-sm", 
+    flowerColors: ["#5EEAD4", "#2DD4BF", "#14B8A6", "#0D9488"], 
+    colors: ROSE_COLORS,
     emoji: "🎉", 
     music: "/music/celebration.mp3" 
   },
   valentinesday: { 
     id: 'valentinesday',
-    color: "text-rose-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]", 
-    flowerColors: ["#E11D48", "#BE123C", "#FB7185", "#F43F5E"], // Confetti colors
+    color: "text-rose-400 drop-shadow-sm", 
     emoji: "🌺", 
     music: "/music/valentine.mp3",
-    // Special Red/Pink mix for Valentine's
+    flowerColors: ["#E11D48", "#BE123C", "#FB7185", "#F43F5E"], 
     colors: [
       { petal: "#D50000", center: "#5D1010" }, 
       { petal: "#FF1744", center: "#880E4F" }, 
@@ -81,6 +80,13 @@ const THEMES = {
   },
 };
 
+// --- Glass Styles ---
+const glassCardStyle = "bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl rounded-[24px] md:rounded-[30px]";
+const glassInputStyle = "bg-black/10 shadow-inner border border-white/10 focus:border-white/30 text-slate-600 placeholder:text-slate-400";
+const glassButtonStyle = "bg-white/20 hover:bg-white/30 border border-white/30 shadow-lg text-purple-600 transition-all duration-300";
+const insetGlassStyle = "bg-black/10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] border border-white/5 rounded-2xl";
+const mainBackgroundStyle = "bg-[conic-gradient(at_top_left,_var(--tw-gradient-stops))] from-slate-900 via-purple-900 to-slate-900";
+
 export default function WishDisplay({ wish }: WishProps) {
   const [locked, setLocked] = useState(!!wish.pin);
   const [inputPin, setInputPin] = useState('');
@@ -88,8 +94,8 @@ export default function WishDisplay({ wish }: WishProps) {
   const [flowers, setFlowers] = useState<Flower[]>([]);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  
   const themeKey = (wish.theme as ThemeType) || 'birthday';
-  // Fallback to birthday if theme key doesn't match
   const theme = THEMES[themeKey] || THEMES.birthday;
 
   // --- Auto-Play Logic ---
@@ -97,7 +103,7 @@ export default function WishDisplay({ wish }: WishProps) {
     if (audioRef.current && !isPlaying) {
       audioRef.current.play()
         .then(() => setIsPlaying(true))
-        .catch((e) => console.log("Autoplay blocked by browser - waiting for interaction"));
+        .catch(() => console.log("Autoplay waiting for interaction"));
     }
   };
 
@@ -126,12 +132,12 @@ export default function WishDisplay({ wish }: WishProps) {
 
   const triggerConfetti = () => {
     confetti({ 
-      particleCount: 200, 
-      spread: 150, 
+      particleCount: 150, 
+      spread: 120, 
       origin: { y: 0.6 },
       colors: theme.flowerColors,
-      scalar: 1.2,
-      drift: 0.5,
+      scalar: 1.1,
+      drift: 0.2,
     });
   };
 
@@ -152,22 +158,19 @@ export default function WishDisplay({ wish }: WishProps) {
     if (!isPlaying) attemptPlay();
 
     const target = e.target as HTMLElement;
+    // Don't spawn flowers if clicking buttons or inputs
     if (target.tagName === 'BUTTON' || target.tagName === 'INPUT' || target.closest('.wish-card')) {
       return;
     }
 
-    // Now TypeScript knows theme.colors always exists
-    const availableColors = theme.colors; 
+    const availableColors = theme.colors;
     const colorPalette = availableColors[Math.floor(Math.random() * availableColors.length)];
     
-    // Taller flowers for better visibility on all screens
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-    const isTablet = typeof window !== 'undefined' && window.innerWidth < 1024;
+    // Adjusted heights: Much taller for mobile
+    const isMobile = window.innerWidth < 640;
     const height = isMobile 
-      ? 220 + Math.random() * 120  // Mobile: 220-340px
-      : isTablet 
-      ? 260 + Math.random() * 140  // Tablet: 260-400px
-      : 300 + Math.random() * 150; // Desktop: 300-450px
+      ? 260 + Math.random() * 120  // Mobile: 260px - 380px (Significantly taller)
+      : 220 + Math.random() * 130; // Desktop/Tablet: Unchanged
 
     const newFlower: Flower = {
       id: Date.now() + Math.random(),
@@ -175,15 +178,16 @@ export default function WishDisplay({ wish }: WishProps) {
       baseHeight: height,
       petalColor: colorPalette.petal,
       centerColor: colorPalette.center,
-      stemCurve: -30 + Math.random() * 60,
-      swayDelay: Math.random() * 1.5,
+      stemCurve: -20 + Math.random() * 40,
+      swayDelay: Math.random() * 2,
     };
     
     setFlowers((prev) => [...prev, newFlower]);
 
+    // Flowers fade out after 10s
     setTimeout(() => {
       setFlowers((prev) => prev.filter((f) => f.id !== newFlower.id));
-    }, 15000);
+    }, 10000);
   };
 
   useEffect(() => {
@@ -195,42 +199,34 @@ export default function WishDisplay({ wish }: WishProps) {
   // --- Render: Locked State ---
   if (locked) {
     return (
-      <div className={`min-h-screen flex items-center justify-center p-3 sm:p-4 bg-gradient-to-br from-gray-900 via-gray-800 to-black`}>
+      <div className={`min-h-screen flex items-center justify-center p-4 ${mainBackgroundStyle}`}>
         <audio ref={audioRef} src={theme.music} loop /> 
         
         <motion.div 
-          initial={{ scale: 0.9, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, type: "spring" }}
-          className="w-full max-w-[90%] sm:max-w-[85%] md:max-w-sm p-6 sm:p-8 text-center bg-white/10 backdrop-blur-xl rounded-2xl sm:rounded-[25px] md:rounded-[30px] shadow-2xl border border-white/20"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className={`w-full max-w-[90%] md:max-w-sm p-8 text-center ${glassCardStyle}`}
         >
           <motion.div 
-            animate={{ scale: [1, 1.05, 1], rotate: [0, 5, -5, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4 sm:mb-6 text-white shadow-lg"
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-6 text-blue-900"
           >
-            <Lock className="w-7 h-7 sm:w-8 sm:h-8" />
+            <Lock className="w-6 h-6 md:w-8 md:h-8" />
           </motion.div>
-          <h2 className="text-xl sm:text-2xl font-black mb-2 sm:mb-3 text-white">Protected Wish</h2>
-          <p className="text-xs sm:text-sm text-white/80 mb-6 sm:mb-8 font-medium">Enter the secret PIN to unlock magic</p>
+          <h2 className="text-xl md:text-2xl font-bold mb-2 text-blue-700">Protected Wish</h2>
           
           <input 
             type="password" 
             maxLength={4}
-            className="w-full p-4 sm:p-5 mb-6 sm:mb-8 text-center tracking-[1.2em] sm:tracking-[1.5em] text-xl sm:text-2xl font-bold outline-none rounded-xl sm:rounded-2xl bg-black/20 border border-white/10 focus:border-white/40 text-white placeholder-white/30 transition-all"
+            className={`w-full p-4 mb-6 text-center tracking-[1em] text-xl font-bold outline-none rounded-xl ${glassInputStyle}`}
             placeholder="••••"
             onChange={(e) => setInputPin(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && unlock()}
           />
           
-          <motion.button 
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={unlock} 
-            className="w-full py-4 sm:py-5 rounded-xl sm:rounded-2xl font-black text-base sm:text-lg tracking-wider uppercase bg-white/20 hover:bg-white/30 text-white border border-white/30 shadow-lg transition-all"
-          >
-            <Unlock size={18} className="sm:w-5 sm:h-5 inline mr-2 sm:mr-3 -mt-1" /> Unlock Wish
-          </motion.button>
+          <button onClick={unlock} className={`w-full py-4 rounded-xl font-bold text-sm uppercase ${glassButtonStyle}`}>
+            Unlock Wish
+          </button>
         </motion.div>
       </div>
     );
@@ -240,61 +236,46 @@ export default function WishDisplay({ wish }: WishProps) {
   return (
     <div 
       onClick={handleScreenClick}
-      className={`relative min-h-screen flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-hidden cursor-pointer bg-[conic-gradient(at_top_left,_var(--tw-gradient-stops))] from-indigo-900 via-purple-900 to-pink-900`}
+      // Layout: Top-aligned on mobile (pt-14) to leave room for flowers at bottom
+      className={`min-h-screen flex flex-col items-center justify-start pt-18 md:justify-center md:pt-0 p-4 relative overflow-hidden ${mainBackgroundStyle}`}
+      style={{ cursor: 'pointer' }}
     >
       <audio ref={audioRef} src={theme.music} loop />
-      
-      {/* Music Toggle */}
-      <motion.button 
-        onClick={toggleMusic}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        className="fixed top-3 right-3 sm:top-4 sm:right-4 md:top-6 md:right-6 z-50 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-xl transition-all hover:bg-white/20"
-      >
-        {isPlaying ? (
-          <Pause className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" fill="currentColor" />
-        ) : (
-          <Play className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 ml-0.5" fill="currentColor" />
-        )}
-      </motion.button>
 
-      {/* Main Wish Card */}
-      <motion.div 
-        initial={{ scale: 0.95, opacity: 0, y: 30 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        transition={{ duration: 1, type: "spring", bounce: 0.3 }}
-        className="wish-card relative z-20 w-full max-w-[95%] sm:max-w-2xl md:max-w-3xl p-6 sm:p-8 md:p-12 text-center bg-white/10 backdrop-blur-xl rounded-2xl sm:rounded-[25px] md:rounded-[30px] shadow-2xl border border-white/20"
-      >
-        <motion.div 
-          animate={{
-            y: [0, -8, 0],
-            rotate: [0, -2, 2, -2, 0],
-            scale: [1, 1.03, 1],
-          }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="text-4xl sm:text-5xl md:text-8xl mb-3 sm:mb-4 md:mb-8 filter drop-shadow-lg"
+      <div className="absolute top-4 right-4 md:top-8 md:right-8 flex gap-3 z-50">
+        <motion.button 
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={toggleMusic} 
+          className={`p-3 rounded-full ${glassButtonStyle}`}
         >
+           {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" />}
+         </motion.button>
+      </div>
+
+      <motion.div 
+        initial={{ y: -30, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, type: "spring" }}
+        className={`wish-card relative z-20 w-full max-w-[95%] sm:max-w-lg md:max-w-xl p-5 sm:p-8 md:p-12 text-center ${glassCardStyle}`}
+      >
+        <div className="text-5xl sm:text-6xl md:text-8xl mb-3 sm:mb-6 animate-bounce">
           {theme.emoji}
-        </motion.div>
+        </div>
         
-        <h1 className={`text-2xl sm:text-3xl md:text-6xl font-black mb-4 sm:mb-6 md:mb-8 ${theme.color} tracking-tight leading-tight`}>
+        <h1 className={`text-2xl sm:text-3xl md:text-5xl font-black mb-4 sm:mb-6 ${theme.color} tracking-tight`}>
           For {wish.name}
         </h1>
         
-        <div className="relative p-4 sm:p-6 md:p-8 min-h-[100px] sm:min-h-[120px] md:min-h-[160px] flex items-center justify-center bg-black/20 border border-white/10 rounded-2xl sm:rounded-3xl shadow-inner">
-          <p className="text-base sm:text-lg md:text-3xl text-white/90 leading-relaxed font-medium italic drop-shadow-md">
+        <div className={`relative p-4 sm:p-6 min-h-[100px] flex items-center justify-center ${insetGlassStyle}`}>
+          <p className="text-base sm:text-xl md:text-2xl text-pink-600 italic font-medium leading-relaxed">
             &ldquo;{wish.message}&rdquo;
           </p>
         </div>
         
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          className="mt-4 sm:mt-6 md:mt-10 text-[9px] sm:text-[10px] md:text-sm text-white/70 uppercase tracking-[0.3em] sm:tracking-[0.4em] font-extrabold"
-        >
-          Tap anywhere to bloom roses 🌹✨
-        </motion.div>
+        <div className="mt-4 sm:mt-8 text-[10px] sm:text-xs text-purple-500 uppercase tracking-[0.2em] font-bold">
+          Tap below to bloom roses 🌹
+        </div>
       </motion.div>
 
       {/* Rose Garden Layer */}
@@ -307,29 +288,17 @@ export default function WishDisplay({ wish }: WishProps) {
   );
 }
 
-// --- Beautiful Rose Component ---
+// --- Animated Growing Rose Component ---
 function RoseComponent({ flower }: { flower: Flower }) {
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-  const flowerWidth = isMobile ? 90 : 110;
+  const flowerWidth = isMobile ? 70 : 100;
   
   return (
     <motion.div
-      initial={{ opacity: 0, y: 60, scale: 0.7 }}
-      animate={{ 
-        opacity: 1, 
-        y: 0,
-        scale: 1,
-        rotate: [0, 2, -1.5, 2, 0],
-        x: [0, 3, -2, 3, 0],
-      }}
-      exit={{ opacity: 0, scale: 0.6, y: 40 }}
-      transition={{ 
-        opacity: { duration: 1 },
-        y: { duration: 1.4, type: "spring", stiffness: 80 },
-        scale: { duration: 1.2 },
-        rotate: { duration: 8, repeat: Infinity, ease: "easeInOut", delay: flower.swayDelay },
-        x: { duration: 8, repeat: Infinity, ease: "easeInOut", delay: flower.swayDelay },
-      }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, scale: 0.5, y: 20 }}
+      transition={{ opacity: { duration: 0.5 } }}
       style={{
         position: 'fixed',
         bottom: 0,
@@ -340,161 +309,79 @@ function RoseComponent({ flower }: { flower: Flower }) {
         zIndex: 10,
         pointerEvents: 'none',
         transformOrigin: 'bottom center',
-        filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.3))'
+        filter: 'drop-shadow(0 5px 10px rgba(0,0,0,0.3))' 
       }}
     >
-      <svg 
-        width={flowerWidth} 
-        height={flower.baseHeight}
-        viewBox={`0 0 ${flowerWidth + 20} ${flower.baseHeight}`}
-        style={{ overflow: 'visible' }}
+      <motion.div
+        // Sway animation (Wind effect)
+        animate={{ rotate: [0, 1.5, -1.5, 0], x: [0, 2, -2, 0] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: flower.swayDelay }}
+        style={{ width: '100%', height: '100%', transformOrigin: 'bottom center' }}
       >
-        {/* Stem */}
-        <motion.path
-          d={`M 60 ${flower.baseHeight} Q ${60 + flower.stemCurve} ${flower.baseHeight * 0.5} 60 35`}
-          stroke="#2F7C31"
-          strokeWidth="6"
-          fill="none"
-          strokeLinecap="round"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
-          transition={{ duration: 1.8, ease: "easeOut" }}
-        />
-
-        {/* Thorns */}
-        {[0.25, 0.45, 0.65, 0.8].map((position, index) => {
-          const y = flower.baseHeight - (flower.baseHeight * position);
-          const side = index % 2 === 0 ? 1 : -1;
-          const thornX = 60 + (side * 5);
+        <svg width={flowerWidth} height={flower.baseHeight} viewBox={`0 0 120 ${flower.baseHeight}`} style={{ overflow: 'visible' }}>
+          {/* 1. Growing Stem */}
+          <motion.path 
+            d={`M 60 ${flower.baseHeight} Q ${60 + flower.stemCurve} ${flower.baseHeight * 0.5} 60 35`} 
+            stroke="#2F7C31" 
+            strokeWidth="4" 
+            fill="none" 
+            strokeLinecap="round" 
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+          />
           
-          return (
-            <motion.path
-              key={`thorn-${index}`}
-              d={`M ${60} ${y} L ${thornX} ${y - 7}`}
-              stroke="#2F7C31"
-              strokeWidth="2.5"
-              fill="none"
-              strokeLinecap="round"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.9 }}
-              transition={{ delay: 0.8 + index * 0.1, duration: 0.3 }}
-            />
-          );
-        })}
+          {/* 2. Leaves - Pop out with FIXED Alignment */}
+          {/* Left Leaf */}
+          <motion.g 
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.5, type: "spring" }}
+            style={{ transformOrigin: `60px ${flower.baseHeight * 0.6}px` }}
+          >
+             <path d={`M 60 ${flower.baseHeight * 0.6} Q 40 ${flower.baseHeight * 0.55} 30 ${flower.baseHeight * 0.5}`} stroke="#2F7C31" strokeWidth="2" fill="none" />
+             <ellipse 
+                cx="30" 
+                cy={flower.baseHeight * 0.5} 
+                rx="8" 
+                ry="12" 
+                fill="#4CAF50" 
+                transform={`rotate(-30 30 ${flower.baseHeight * 0.5})`} 
+             />
+          </motion.g>
 
-        {/* Leaves */}
-        {[0.4, 0.6].map((position, index) => {
-          const y = flower.baseHeight - (flower.baseHeight * position);
-          const side = index % 2 === 0 ? -1 : 1;
-          const leafX = 60 + (side * 20);
-          
-          return (
-            <motion.g key={`leaf-${index}`}>
-              <motion.path
-                d={`M 60 ${y} Q ${60 + side * 12} ${y - 6} ${leafX} ${y - 10}`}
-                stroke="#2F7C31"
-                strokeWidth="3"
-                fill="none"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ delay: 1.2 + index * 0.2, duration: 0.5 }}
-              />
-              <motion.ellipse
-                cx={leafX}
-                cy={y - 10}
-                rx="12"
-                ry="18"
-                fill="#4CAF50"
-                opacity="0.95"
-                transform={`rotate(${side * 35} ${leafX} ${y - 10})`}
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 0.95 }}
-                transition={{ delay: 1.4 + index * 0.2, duration: 0.6, type: "spring", bounce: 0.4 }}
-              />
-            </motion.g>
-          );
-        })}
+          {/* Right Leaf */}
+          <motion.g 
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.7, duration: 0.5, type: "spring" }}
+            style={{ transformOrigin: `60px ${flower.baseHeight * 0.45}px` }}
+          >
+             <path d={`M 60 ${flower.baseHeight * 0.45} Q 80 ${flower.baseHeight * 0.4} 90 ${flower.baseHeight * 0.35}`} stroke="#2F7C31" strokeWidth="2" fill="none" />
+             <ellipse 
+                cx="90" 
+                cy={flower.baseHeight * 0.35} 
+                rx="8" 
+                ry="12" 
+                fill="#4CAF50" 
+                transform={`rotate(30 90 ${flower.baseHeight * 0.35})`} 
+             />
+          </motion.g>
 
-        {/* Rose Bloom */}
-        <motion.g
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 2, duration: 1.5, ease: "easeOut" }}
-        >
-          {/* Outer Petals */}
-          {[0, 60, 120, 180, 240, 300].map((angle, index) => (
-            <motion.ellipse
-              key={`outer-petal-${index}`}
-              cx="60"
-              cy="30"
-              rx="13"
-              ry="20"
-              fill={flower.petalColor}
-              opacity="0.98"
-              transform={`rotate(${angle} 60 30)`}
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 0.98 }}
-              transition={{ delay: 2.2 + index * 0.08, duration: 0.7, type: "spring", bounce: 0.3 }}
-            />
-          ))}
-
-          {/* Middle Petals */}
-          {[30, 90, 150, 210, 270, 330].map((angle, index) => (
-            <motion.ellipse
-              key={`middle-petal-${index}`}
-              cx="60"
-              cy="30"
-              rx="10"
-              ry="16"
-              fill={flower.petalColor}
-              opacity="0.95"
-              transform={`rotate(${angle} 60 30)`}
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 0.95 }}
-              transition={{ delay: 2.5 + index * 0.07, duration: 0.6, type: "spring", bounce: 0.3 }}
-            />
-          ))}
-
-          {/* Inner Petals */}
-          {[0, 72, 144, 216, 288].map((angle, index) => (
-            <motion.ellipse
-              key={`inner-petal-${index}`}
-              cx="60"
-              cy="30"
-              rx="7"
-              ry="11"
-              fill={flower.centerColor}
-              opacity="0.98"
-              transform={`rotate(${angle + 15} 60 30)`}
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 0.98 }}
-              transition={{ delay: 2.8 + index * 0.06, duration: 0.5, type: "spring", bounce: 0.35 }}
-            />
-          ))}
-
-          {/* Center */}
-          <motion.circle
-            cx="60"
-            cy="30"
-            r="5"
-            fill={flower.centerColor}
-            opacity="1"
+          {/* 3. Flower Head - Blooms last */}
+          <motion.g
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ delay: 3.1, duration: 0.3, type: "spring" }}
-          />
-          <motion.circle
-            cx="59"
-            cy="28"
-            r="2"
-            fill="#FFFFFF"
-            opacity="0.8"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 3.2, duration: 0.2 }}
-          />
-        </motion.g>
-      </svg>
+            transition={{ delay: 1.2, duration: 0.8, type: "spring", bounce: 0.5 }}
+            style={{ transformOrigin: "60px 30px" }}
+          >
+             {[0, 60, 120, 180, 240, 300].map((angle, i) => (
+               <ellipse key={i} cx="60" cy="30" rx="12" ry="18" fill={flower.petalColor} transform={`rotate(${angle} 60 30)`} />
+             ))}
+             <circle cx="60" cy="30" r="5" fill={flower.centerColor} />
+          </motion.g>
+        </svg>
+      </motion.div>
     </motion.div>
   );
 }
